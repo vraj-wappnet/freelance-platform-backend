@@ -1,0 +1,32 @@
+import { Role } from '../../common/enums/roles.enum';
+import { Project } from '../../projects/entities/project.entity';
+import { Bid } from '../../bids/entities/bid.entity';
+import { Contract } from '../../contracts/entities/contract.entity';
+import { Message } from '../../messages/entities/message.entity';
+export declare class User {
+    id: string;
+    user_id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role: Role;
+    profilePicture: string;
+    bio: string;
+    location: string;
+    phone: string;
+    website: string;
+    isActive: boolean;
+    isVerified: boolean;
+    passwordResetToken: string;
+    passwordResetExpires: Date;
+    refreshToken: string;
+    ownedProjects: Project[];
+    bids: Bid[];
+    clientContracts: Contract[];
+    freelancerContracts: Contract[];
+    sentMessages: Message[];
+    receivedMessages: Message[];
+    createdAt: Date;
+    updatedAt: Date;
+}
