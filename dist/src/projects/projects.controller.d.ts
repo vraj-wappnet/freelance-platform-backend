@@ -15,5 +15,6 @@ export declare class ProjectsController {
     findOne(id: string): Promise<import("./entities/project.entity").Project>;
     update(id: string, req: UserRequest, updateProjectDto: UpdateProjectDto): Promise<import("./entities/project.entity").Project>;
     remove(id: string, req: UserRequest): Promise<void>;
+    findByUserId(userId: string): Promise<import("./entities/project.entity").Project[]>;
 }
 export {};

@@ -40,6 +40,9 @@ let ProjectsController = class ProjectsController {
     remove(id, req) {
         return this.projectsService.remove(id, req.user.id);
     }
+    findByUserId(userId) {
+        return this.projectsService.findByUserId(userId);
+    }
 };
 exports.ProjectsController = ProjectsController;
 __decorate([
@@ -137,6 +140,21 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)("user/:userId"),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiOperation)({ summary: "Get projects by user ID" }),
+    (0, swagger_1.ApiParam)({ name: "userId", description: "User ID" }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "Return all projects for the specified user",
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: "User not found." }),
+    __param(0, (0, common_1.Param)("userId", common_1.ParseUUIDPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "findByUserId", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)("projects"),
     (0, common_1.Controller)("projects"),

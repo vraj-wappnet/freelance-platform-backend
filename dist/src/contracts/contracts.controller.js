@@ -26,10 +26,17 @@ let ContractsController = class ContractsController {
         this.contractsService = contractsService;
     }
     create(req, createContractDto) {
+        console.log("Creating contract with:", {
+            userId: req.user.id,
+            createContractDto,
+        });
         return this.contractsService.create(req.user.id, createContractDto);
     }
     findAll(clientId, freelancerId, projectId, status) {
         return this.contractsService.findAll(clientId, freelancerId, projectId, status);
+    }
+    findByUser(req) {
+        return this.contractsService.findByUser(req.user.id);
     }
     findOne(id) {
         return this.contractsService.findOne(id);
@@ -100,6 +107,22 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ContractsController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)("user"),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiOperation)({
+        summary: "Get contracts for the authenticated user (client or freelancer)",
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "Return all contracts where the user is either client or freelancer",
+    }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: "Unauthorized." }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ContractsController.prototype, "findByUser", null);
+__decorate([
     (0, common_1.Get)(":id"),
     (0, swagger_1.ApiBearerAuth)("access-token"),
     (0, swagger_1.ApiOperation)({ summary: "Get contract by ID" }),
@@ -116,6 +139,7 @@ __decorate([
 ], ContractsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(":id"),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.CLIENT, roles_enum_1.Role.FREELANCER, roles_enum_1.Role.ADMIN),
     (0, swagger_1.ApiBearerAuth)("access-token"),
     (0, swagger_1.ApiOperation)({ summary: "Update contract" }),
     (0, swagger_1.ApiParam)({ name: "id", description: "Contract ID" }),

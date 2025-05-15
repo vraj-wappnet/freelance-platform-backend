@@ -35,6 +35,7 @@ interface UserRequest extends Request {
   };
 }
 
+// bids/bids.controller.ts
 @ApiTags("bids")
 @Controller("bids")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -56,6 +57,19 @@ export class BidsController {
   })
   create(@Req() req: UserRequest, @Body() createBidDto: CreateBidDto) {
     return this.bidsService.create(req.user.id, createBidDto);
+  }
+
+  // New endpoint for getting bids by user ID
+  @Get("user")
+  @ApiBearerAuth("access-token")
+  @ApiOperation({ summary: "Get bids by user ID (freelancer or client)" })
+  @ApiResponse({
+    status: 200,
+    description: "Return all bids for the user",
+  })
+  @ApiResponse({ status: 403, description: "Forbidden." })
+  findByUserId(@Req() req: UserRequest) {
+    return this.bidsService.findByUserId(req.user.id);
   }
 
   @Get()

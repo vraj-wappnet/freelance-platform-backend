@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -60,6 +61,23 @@ export class UsersService {
    */
   async findAll(): Promise<User[]> {
     return this.usersRepository.find();
+  }
+
+  /**
+   * Find users by role
+   */
+  async findByRole(role: string): Promise<User[]> {
+    // Import the Role enum at the top if not already imported
+    // import { Role } from './entities/user.entity';
+    if (!['admin', 'client', 'freelancer'].includes(role)) {
+      throw new BadRequestException(`Invalid role: ${role}`);
+    }
+    // Cast the string to the Role enum
+    const users = await this.usersRepository.find({ where: { role: role as any } });
+    if (!users.length) {
+      throw new NotFoundException(`No users found with role: ${role}`);
+    }
+    return users;
   }
 
   /**

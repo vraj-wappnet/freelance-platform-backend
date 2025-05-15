@@ -27,6 +27,9 @@ let BidsController = class BidsController {
     create(req, createBidDto) {
         return this.bidsService.create(req.user.id, createBidDto);
     }
+    findByUserId(req) {
+        return this.bidsService.findByUserId(req.user.id);
+    }
     findAll(projectId, freelancerId) {
         return this.bidsService.findAll(projectId, freelancerId);
     }
@@ -61,6 +64,20 @@ __decorate([
     __metadata("design:paramtypes", [Object, create_bid_dto_1.CreateBidDto]),
     __metadata("design:returntype", void 0)
 ], BidsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)("user"),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiOperation)({ summary: "Get bids by user ID (freelancer or client)" }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "Return all bids for the user",
+    }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: "Forbidden." }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], BidsController.prototype, "findByUserId", null);
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)("access-token"),

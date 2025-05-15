@@ -10,6 +10,7 @@ export declare class BidsService {
     private projectsService;
     constructor(bidsRepository: Repository<Bid>, usersService: UsersService, projectsService: ProjectsService);
     create(userId: string, createBidDto: CreateBidDto): Promise<Bid>;
+    findByUserId(userId: string): Promise<Bid[]>;
     findAll(projectId?: string, freelancerId?: string): Promise<Bid[]>;
     findOne(id: string): Promise<Bid>;
     update(id: string, userId: string, updateBidDto: UpdateBidDto): Promise<Bid>;

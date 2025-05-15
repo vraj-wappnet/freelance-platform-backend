@@ -55,9 +55,78 @@ export class BidsService {
       ...createBidDto,
       freelancer: user,
       project,
+      freelancer_id: userId,
+      project_id: createBidDto.project_id,
     });
 
-    return this.bidsRepository.save(bid);
+    const savedBid = await this.bidsRepository.save(bid);
+
+    // Fetch the complete bid with relations
+    return this.findOne(savedBid.id);
+  }
+
+  // New method to get bids by user ID
+  async findByUserId(userId: string): Promise<Bid[]> {
+    const user = await this.usersService.findById(userId);
+    
+    const queryBuilder = this.bidsRepository
+      .createQueryBuilder('bid')
+      .leftJoinAndSelect('bid.freelancer', 'freelancer')
+      .leftJoinAndSelect('bid.project', 'project')
+      .leftJoinAndSelect('project.client', 'client')
+      .select([
+        'bid',
+        'freelancer.id',
+        'freelancer.user_id',
+        'freelancer.firstName',
+        'freelancer.lastName',
+        'freelancer.email',
+        'freelancer.role',
+        'freelancer.profilePicture',
+        'freelancer.bio',
+        'freelancer.location',
+        'freelancer.phone',
+        'freelancer.website',
+        'freelancer.isActive',
+        'freelancer.isVerified',
+        'freelancer.createdAt',
+        'freelancer.updatedAt',
+        'project.id',
+        'project.title',
+        'project.description',
+        'project.budget',
+        'project.deadline',
+        'project.status',
+        'project.skills',
+        'project.attachments',
+        'project.createdAt',
+        'project.updatedAt',
+        'client.id',
+        'client.user_id',
+        'client.firstName',
+        'client.lastName',
+        'client.email',
+        'client.role',
+        'client.profilePicture',
+        'client.bio',
+        'client.location',
+        'client.phone',
+        'client.website',
+        'client.isActive',
+        'client.isVerified',
+        'client.createdAt',
+        'client.updatedAt',
+      ]);
+
+    if (user.role === Role.FREELANCER) {
+      queryBuilder.where('bid.freelancer_id = :userId', { userId });
+    } else if (user.role === Role.CLIENT) {
+      queryBuilder.where('project.client_id = :userId', { userId });
+    } else {
+      throw new ForbiddenException('Invalid user role for viewing bids');
+    }
+
+    return queryBuilder.getMany();
   }
 
   /**
@@ -92,9 +161,6 @@ export class BidsService {
     return queryBuilder.getMany();
   }
 
-  /**
-   * Find a bid by id
-   */
   async findOne(id: string): Promise<Bid> {
     const bid = await this.bidsRepository.findOne({
       where: { id },

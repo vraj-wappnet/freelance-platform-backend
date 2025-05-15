@@ -27,7 +27,7 @@ let ProjectsService = class ProjectsService {
     async create(userId, createProjectDto) {
         const user = await this.usersService.findById(userId);
         if (user.role !== roles_enum_1.Role.CLIENT) {
-            throw new common_1.ForbiddenException('Only clients can create projects');
+            throw new common_1.ForbiddenException("Only clients can create projects");
         }
         const project = this.projectsRepository.create({
             ...createProjectDto,
@@ -37,17 +37,17 @@ let ProjectsService = class ProjectsService {
     }
     async findAll(status, skills, clientId) {
         const queryBuilder = this.projectsRepository
-            .createQueryBuilder('project')
-            .leftJoinAndSelect('project.client', 'client')
+            .createQueryBuilder("project")
+            .leftJoinAndSelect("project.client", "client")
             .select([
-            'project',
-            'client.id',
-            'client.user_id',
-            'client.firstName',
-            'client.lastName',
+            "project",
+            "client.id",
+            "client.user_id",
+            "client.firstName",
+            "client.lastName",
         ]);
         if (status) {
-            queryBuilder.andWhere('project.status = :status', { status });
+            queryBuilder.andWhere("project.status = :status", { status });
         }
         if (skills && skills.length > 0) {
             skills.forEach((skill, index) => {
@@ -57,25 +57,35 @@ let ProjectsService = class ProjectsService {
             });
         }
         if (clientId) {
-            queryBuilder.andWhere('project.client_id = :clientId', { clientId });
+            queryBuilder.andWhere("project.client_id = :clientId", { clientId });
         }
         return queryBuilder.getMany();
     }
     async findOne(id) {
         const project = await this.projectsRepository.findOne({
             where: { id },
-            relations: ['client', 'bids', 'bids.freelancer'],
+            relations: ["client", "bids", "bids.freelancer"],
         });
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID "${id}" not found`);
         }
         return project;
     }
+    async findByUserId(userId) {
+        const user = await this.usersService.findById(userId);
+        if (!user) {
+            throw new common_1.NotFoundException(`User with ID "${userId}" not found`);
+        }
+        return this.projectsRepository.find({
+            where: { client: { id: userId } },
+            relations: ["client", "bids", "bids.freelancer"],
+        });
+    }
     async update(id, userId, updateProjectDto) {
         const project = await this.findOne(id);
         const user = await this.usersService.findById(userId);
         if (project.client.id !== userId && user.role !== roles_enum_1.Role.ADMIN) {
-            throw new common_1.ForbiddenException('You can only update your own projects');
+            throw new common_1.ForbiddenException("You can only update your own projects");
         }
         Object.assign(project, updateProjectDto);
         return this.projectsRepository.save(project);
@@ -84,7 +94,7 @@ let ProjectsService = class ProjectsService {
         const project = await this.findOne(id);
         const user = await this.usersService.findById(userId);
         if (project.client.id !== userId && user.role !== roles_enum_1.Role.ADMIN) {
-            throw new common_1.ForbiddenException('You can only delete your own projects');
+            throw new common_1.ForbiddenException("You can only delete your own projects");
         }
         await this.projectsRepository.remove(project);
     }

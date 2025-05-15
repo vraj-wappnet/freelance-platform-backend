@@ -50,6 +50,16 @@ let UsersService = class UsersService {
     async findAll() {
         return this.usersRepository.find();
     }
+    async findByRole(role) {
+        if (!['admin', 'client', 'freelancer'].includes(role)) {
+            throw new common_1.BadRequestException(`Invalid role: ${role}`);
+        }
+        const users = await this.usersRepository.find({ where: { role: role } });
+        if (!users.length) {
+            throw new common_1.NotFoundException(`No users found with role: ${role}`);
+        }
+        return users;
+    }
     async findById(id) {
         const user = await this.usersRepository.findOneBy({ id });
         if (!user) {

@@ -1,29 +1,22 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
   Req,
+  Get,
+  Query,
   UseInterceptors,
   ClassSerializerInterceptor,
-  ParseUUIDPipe,
 } from "@nestjs/common";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiParam,
-  ApiQuery,
   ApiBearerAuth,
 } from "@nestjs/swagger";
 import { MessagesService } from "./messages.service";
 import { CreateMessageDto } from "./dto/create-message.dto";
-import { UpdateMessageDto } from "./dto/update-message.dto";
-import { UserRequest } from "../common/interfaces/user-request.interface"; // Import shared interface
+import { UserRequest } from "../common/interfaces/user-request.interface";
 
 @ApiTags("messages")
 @Controller("messages")
@@ -42,79 +35,18 @@ export class MessagesController {
     return this.messagesService.create(req.user.id, createMessageDto);
   }
 
-  @Get()
+  @Get("conversation")
   @ApiBearerAuth("access-token")
-  @ApiOperation({ summary: "Get all messages for the current user" })
-  @ApiQuery({
-    name: "conversationWithId",
-    required: false,
-    description: "Filter messages to conversation with specific user",
-  })
+  @ApiOperation({ summary: "Get conversation messages between two users" })
   @ApiResponse({
     status: 200,
-    description: "Return all messages for the user",
+    description: "List of messages in the conversation.",
   })
-  findAll(
+  getConversation(
     @Req() req: UserRequest,
-    @Query("conversationWithId") conversationWithId?: string
+    @Query("userId") userId: string,
+    @Query("recipientId") recipientId: string
   ) {
-    return this.messagesService.findAll(req.user.id, conversationWithId);
-  }
-
-  @Get("unread-count")
-  @ApiBearerAuth("access-token")
-  @ApiOperation({ summary: "Get count of unread messages" })
-  @ApiResponse({
-    status: 200,
-    description: "Return count of unread messages",
-  })
-  getUnreadCount(@Req() req: UserRequest) {
-    return this.messagesService.getUnreadCount(req.user.id);
-  }
-
-  @Get(":id")
-  @ApiBearerAuth("access-token")
-  @ApiOperation({ summary: "Get message by ID" })
-  @ApiParam({ name: "id", description: "Message ID" })
-  @ApiResponse({
-    status: 200,
-    description: "Return the message",
-  })
-  @ApiResponse({ status: 403, description: "Forbidden." })
-  @ApiResponse({ status: 404, description: "Message not found." })
-  findOne(@Param("id", ParseUUIDPipe) id: string, @Req() req: UserRequest) {
-    return this.messagesService.findOne(id, req.user.id);
-  }
-
-  @Patch(":id")
-  @ApiBearerAuth("access-token")
-  @ApiOperation({ summary: "Update message (mark as read)" })
-  @ApiParam({ name: "id", description: "Message ID" })
-  @ApiResponse({
-    status: 200,
-    description: "The message has been successfully updated.",
-  })
-  @ApiResponse({ status: 403, description: "Forbidden." })
-  @ApiResponse({ status: 404, description: "Message not found." })
-  update(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Req() req: UserRequest,
-    @Body() updateMessageDto: UpdateMessageDto
-  ) {
-    return this.messagesService.update(id, req.user.id, updateMessageDto);
-  }
-
-  @Delete(":id")
-  @ApiBearerAuth("access-token")
-  @ApiOperation({ summary: "Delete message" })
-  @ApiParam({ name: "id", description: "Message ID" })
-  @ApiResponse({
-    status: 200,
-    description: "The message has been successfully deleted.",
-  })
-  @ApiResponse({ status: 403, description: "Forbidden." })
-  @ApiResponse({ status: 404, description: "Message not found." })
-  remove(@Param("id", ParseUUIDPipe) id: string, @Req() req: UserRequest) {
-    return this.messagesService.remove(id, req.user.id);
+    return this.messagesService.findConversation(userId, recipientId);
   }
 }

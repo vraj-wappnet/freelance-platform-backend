@@ -128,4 +128,18 @@ export class ProjectsController {
   remove(@Param("id", ParseUUIDPipe) id: string, @Req() req: UserRequest) {
     return this.projectsService.remove(id, req.user.id);
   }
+
+  // projects.controller.ts
+  @Get("user/:userId")
+  @ApiBearerAuth("access-token")
+  @ApiOperation({ summary: "Get projects by user ID" })
+  @ApiParam({ name: "userId", description: "User ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Return all projects for the specified user",
+  })
+  @ApiResponse({ status: 404, description: "User not found." })
+  findByUserId(@Param("userId", ParseUUIDPipe) userId: string) {
+    return this.projectsService.findByUserId(userId);
+  }
 }

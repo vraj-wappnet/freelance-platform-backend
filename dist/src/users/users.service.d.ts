@@ -7,6 +7,7 @@ export declare class UsersService {
     constructor(usersRepository: Repository<User>);
     create(createUserDto: CreateUserDto): Promise<User>;
     findAll(): Promise<User[]>;
+    findByRole(role: string): Promise<User[]>;
     findById(id: string): Promise<User>;
     findByUserId(userId: string): Promise<User>;
     findByEmail(email: string): Promise<User>;

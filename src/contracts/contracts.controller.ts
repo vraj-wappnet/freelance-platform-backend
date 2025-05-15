@@ -11,7 +11,6 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   ParseUUIDPipe,
-  ParseEnumPipe,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -52,6 +51,10 @@ export class ContractsController {
     @Req() req: UserRequest,
     @Body() createContractDto: CreateContractDto
   ) {
+    console.log("Creating contract with:", {
+      userId: req.user.id,
+      createContractDto,
+    });
     return this.contractsService.create(req.user.id, createContractDto);
   }
 
@@ -97,6 +100,21 @@ export class ContractsController {
     );
   }
 
+  @Get("user")
+  @ApiBearerAuth("access-token")
+  @ApiOperation({
+    summary: "Get contracts for the authenticated user (client or freelancer)",
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      "Return all contracts where the user is either client or freelancer",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized." })
+  findByUser(@Req() req: UserRequest) {
+    return this.contractsService.findByUser(req.user.id);
+  }
+
   @Get(":id")
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "Get contract by ID" })
@@ -111,6 +129,7 @@ export class ContractsController {
   }
 
   @Patch(":id")
+  @Roles(Role.CLIENT, Role.FREELANCER, Role.ADMIN)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "Update contract" })
   @ApiParam({ name: "id", description: "Contract ID" })

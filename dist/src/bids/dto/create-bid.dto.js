@@ -10,47 +10,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBidDto = void 0;
-const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateBidDto {
 }
 exports.CreateBidDto = CreateBidDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'Bid amount',
-        example: 1000,
-    }),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateBidDto.prototype, "amount", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'Delivery time in days',
-        example: 14,
-    }),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateBidDto.prototype, "deliveryTime", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'Proposal text',
-        example: 'I can deliver this project using React and Node.js...',
-    }),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateBidDto.prototype, "proposal", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'Project ID',
-        example: '123e4567-e89b-12d3-a456-426614174000',
-    }),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], CreateBidDto.prototype, "project_id", void 0);
 //# sourceMappingURL=create-bid.dto.js.map

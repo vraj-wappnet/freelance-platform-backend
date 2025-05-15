@@ -17,8 +17,8 @@ class ForgotPasswordDto {
 exports.ForgotPasswordDto = ForgotPasswordDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User email',
-        example: 'john.doe@example.com',
+        description: "User email",
+        example: "john.doe@example.com",
     }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsEmail)(),

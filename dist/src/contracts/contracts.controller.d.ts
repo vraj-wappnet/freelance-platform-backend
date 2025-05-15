@@ -8,6 +8,7 @@ export declare class ContractsController {
     constructor(contractsService: ContractsService);
     create(req: UserRequest, createContractDto: CreateContractDto): Promise<import("./entities/contract.entity").Contract>;
     findAll(clientId?: string, freelancerId?: string, projectId?: string, status?: ContractStatus): Promise<import("./entities/contract.entity").Contract[]>;
+    findByUser(req: UserRequest): Promise<import("./entities/contract.entity").Contract[]>;
     findOne(id: string): Promise<import("./entities/contract.entity").Contract>;
     update(id: string, req: UserRequest, updateContractDto: UpdateContractDto): Promise<import("./entities/contract.entity").Contract>;
     remove(id: string, req: UserRequest): Promise<void>;
