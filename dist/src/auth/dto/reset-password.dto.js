@@ -26,13 +26,14 @@ __decorate([
 ], ResetPasswordDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'Reset token',
-        example: '6c84fb90-12c4-11e1-840d-7b25c5ee775a',
+        description: '6-digit OTP',
+        example: '123456',
     }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Length)(6, 6),
     __metadata("design:type", String)
-], ResetPasswordDto.prototype, "token", void 0);
+], ResetPasswordDto.prototype, "otp", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'New password',

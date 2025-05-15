@@ -63,16 +63,16 @@ export class User {
   isVerified: boolean;
 
   @Exclude()
-  @Column({ nullable: true })
-  passwordResetToken: string;
+  @Column({ type: 'varchar', nullable: true })
+  resetOtp: string | null;
 
   @Exclude()
-  @Column({ nullable: true })
-  passwordResetExpires: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  resetOtpExpires: Date | null;
 
   @Exclude()
-  @Column({ nullable: true })
-  refreshToken: string;
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken: string | null;
 
   @OneToMany(() => Project, (project) => project.client)
   ownedProjects: Project[];

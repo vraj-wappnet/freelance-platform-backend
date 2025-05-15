@@ -18,9 +18,9 @@ export declare class User {
     website: string;
     isActive: boolean;
     isVerified: boolean;
-    passwordResetToken: string;
-    passwordResetExpires: Date;
-    refreshToken: string;
+    resetOtp: string | null;
+    resetOtpExpires: Date | null;
+    refreshToken: string | null;
     ownedProjects: Project[];
     bids: Bid[];
     clientContracts: Contract[];

@@ -6,6 +6,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { User } from '../users/entities/user.entity';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 export declare class AuthService {
     private usersService;
     private jwtService;
@@ -20,6 +21,8 @@ export declare class AuthService {
     }>;
     refreshTokens(userId: string, refreshToken: string): Promise<any>;
     logout(userId: string): Promise<boolean>;
+    private generateOtp;
     forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<boolean>;
+    verifyOtp(verifyOtpDto: VerifyOtpDto): Promise<boolean>;
     resetPassword(resetPasswordDto: ResetPasswordDto): Promise<boolean>;
 }

@@ -83,18 +83,18 @@ __decorate([
 ], User.prototype, "isVerified", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)(),
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "passwordResetToken", void 0);
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "resetOtp", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)(),
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", Date)
-], User.prototype, "passwordResetExpires", void 0);
+    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "resetOtpExpires", void 0);
 __decorate([
     (0, class_transformer_1.Exclude)(),
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", Object)
 ], User.prototype, "refreshToken", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => project_entity_1.Project, (project) => project.client),

@@ -96,11 +96,16 @@ let AuthService = class AuthService {
         await this.usersService.setRefreshToken(userId, null);
         return true;
     }
+    generateOtp() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
     async forgotPassword(forgotPasswordDto) {
         try {
             const { email } = forgotPasswordDto;
-            const { token, user } = await this.usersService.setPasswordResetToken(email);
-            const emailSent = await this.emailService.sendPasswordResetEmail(user.email, user.firstName, token);
+            const user = await this.usersService.findByEmail(email);
+            const otp = this.generateOtp();
+            await this.usersService.setPasswordResetOtp(email, otp);
+            const emailSent = await this.emailService.sendPasswordResetEmail(user.email, user.firstName, otp);
             return emailSent;
         }
         catch (error) {
@@ -110,15 +115,26 @@ let AuthService = class AuthService {
             throw error;
         }
     }
-    async resetPassword(resetPasswordDto) {
-        const { email, token, password } = resetPasswordDto;
+    async verifyOtp(verifyOtpDto) {
+        const { email, otp } = verifyOtpDto;
         try {
-            await this.usersService.validatePasswordResetToken(email, token);
-            await this.usersService.resetPassword(email, password);
+            await this.usersService.validatePasswordResetOtp(email, otp);
             return true;
         }
         catch (error) {
-            throw new common_1.BadRequestException('Invalid or expired reset token');
+            throw new common_1.BadRequestException('Invalid or expired OTP');
+        }
+    }
+    async resetPassword(resetPasswordDto) {
+        const { email, otp, password } = resetPasswordDto;
+        try {
+            await this.usersService.validatePasswordResetOtp(email, otp);
+            await this.usersService.resetPassword(email, password);
+            await this.usersService.clearPasswordResetOtp(email);
+            return true;
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Invalid or expired OTP');
         }
     }
 };

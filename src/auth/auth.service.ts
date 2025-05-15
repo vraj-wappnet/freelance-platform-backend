@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { User } from '../users/entities/user.entity';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @Injectable()
 export class AuthService {
@@ -139,20 +140,31 @@ export class AuthService {
   }
 
   /**
-   * Request password reset
+   * Generate a 6-digit OTP
+   */
+  private generateOtp(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  /**
+   * Request password reset with OTP
    */
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<boolean> {
     try {
       const { email } = forgotPasswordDto;
       
-      // Find user and generate token
-      const { token, user } = await this.usersService.setPasswordResetToken(email);
+      // Find user and generate OTP
+      const user = await this.usersService.findByEmail(email);
+      const otp = this.generateOtp();
       
-      // Send reset email
+      // Store OTP with expiration
+      await this.usersService.setPasswordResetOtp(email, otp);
+      
+      // Send OTP email
       const emailSent = await this.emailService.sendPasswordResetEmail(
         user.email,
         user.firstName,
-        token,
+        otp,
       );
       
       return emailSent;
@@ -166,21 +178,38 @@ export class AuthService {
   }
 
   /**
-   * Reset password using token
+   * Verify OTP
    */
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<boolean> {
-    const { email, token, password } = resetPasswordDto;
+  async verifyOtp(verifyOtpDto: VerifyOtpDto): Promise<boolean> {
+    const { email, otp } = verifyOtpDto;
     
     try {
-      // Validate reset token
-      await this.usersService.validatePasswordResetToken(email, token);
+      await this.usersService.validatePasswordResetOtp(email, otp);
+      return true;
+    } catch (error) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+  }
+
+  /**
+   * Reset password using OTP
+   */
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<boolean> {
+    const { email, otp, password } = resetPasswordDto;
+    
+    try {
+      // Validate OTP
+      await this.usersService.validatePasswordResetOtp(email, otp);
       
       // Reset password
       await this.usersService.resetPassword(email, password);
       
+      // Clear OTP after successful reset
+      await this.usersService.clearPasswordResetOtp(email);
+      
       return true;
     } catch (error) {
-      throw new BadRequestException('Invalid or expired reset token');
+      throw new BadRequestException('Invalid or expired OTP');
     }
   }
 }

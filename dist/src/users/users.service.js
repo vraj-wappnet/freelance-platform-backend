@@ -16,7 +16,6 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const uuid_1 = require("uuid");
 const bcrypt = require("bcrypt");
 const user_entity_1 = require("./entities/user.entity");
 let UsersService = class UsersService {
@@ -29,7 +28,7 @@ let UsersService = class UsersService {
                 email: createUserDto.email,
             });
             if (existingUser) {
-                throw new common_1.ConflictException('Email already exists');
+                throw new common_1.ConflictException("Email already exists");
             }
             const generatedUserId = `UID${Math.floor(10000 + Math.random() * 90000)}`;
             const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -44,17 +43,19 @@ let UsersService = class UsersService {
             if (error instanceof common_1.ConflictException) {
                 throw error;
             }
-            throw new common_1.InternalServerErrorException('Error creating user');
+            throw new common_1.InternalServerErrorException("Error creating user");
         }
     }
     async findAll() {
         return this.usersRepository.find();
     }
     async findByRole(role) {
-        if (!['admin', 'client', 'freelancer'].includes(role)) {
+        if (!["admin", "client", "freelancer"].includes(role)) {
             throw new common_1.BadRequestException(`Invalid role: ${role}`);
         }
-        const users = await this.usersRepository.find({ where: { role: role } });
+        const users = await this.usersRepository.find({
+            where: { role: role },
+        });
         if (!users.length) {
             throw new common_1.NotFoundException(`No users found with role: ${role}`);
         }
@@ -86,31 +87,36 @@ let UsersService = class UsersService {
         Object.assign(user, updateUserDto);
         return this.usersRepository.save(user);
     }
-    async setPasswordResetToken(email) {
+    async setPasswordResetOtp(email, otp) {
         const user = await this.findByEmail(email);
-        const token = (0, uuid_1.v4)();
-        user.passwordResetToken = await bcrypt.hash(token, 10);
-        user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000);
+        const hashedOtp = await bcrypt.hash(otp, 10);
+        user.resetOtp = hashedOtp;
+        user.resetOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
         await this.usersRepository.save(user);
-        return { token, user };
     }
-    async validatePasswordResetToken(email, token) {
+    async validatePasswordResetOtp(email, otp) {
         const user = await this.findByEmail(email);
-        if (!user.passwordResetToken ||
-            user.passwordResetExpires < new Date()) {
-            throw new common_1.NotFoundException('Password reset token is invalid or has expired');
+        if (!user.resetOtp ||
+            !user.resetOtpExpires ||
+            user.resetOtpExpires < new Date()) {
+            throw new common_1.BadRequestException("OTP is invalid or has expired");
         }
-        const isValid = await bcrypt.compare(token, user.passwordResetToken);
+        const isValid = await bcrypt.compare(otp, user.resetOtp);
         if (!isValid) {
-            throw new common_1.NotFoundException('Invalid password reset token');
+            throw new common_1.BadRequestException("Invalid OTP");
         }
-        return user;
+    }
+    async clearPasswordResetOtp(email) {
+        const user = await this.findByEmail(email);
+        user.resetOtp = "";
+        user.resetOtpExpires = null;
+        await this.usersRepository.save(user);
     }
     async resetPassword(email, password) {
         const user = await this.findByEmail(email);
         user.password = await bcrypt.hash(password, 10);
-        user.passwordResetToken = '';
-        user.passwordResetExpires = new Date(0);
+        user.resetOtp = "";
+        user.resetOtpExpires = null;
         return this.usersRepository.save(user);
     }
     async setRefreshToken(userId, refreshToken) {
@@ -119,7 +125,7 @@ let UsersService = class UsersService {
             user.refreshToken = await bcrypt.hash(refreshToken, 10);
         }
         else {
-            user.refreshToken = '';
+            user.refreshToken = "";
         }
         await this.usersRepository.save(user);
     }

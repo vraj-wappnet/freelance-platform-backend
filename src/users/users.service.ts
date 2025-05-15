@@ -4,20 +4,19 @@ import {
   ConflictException,
   InternalServerErrorException,
   BadRequestException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import * as bcrypt from 'bcrypt';
-import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import * as bcrypt from "bcrypt";
+import { User } from "./entities/user.entity";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersRepository: Repository<User>
   ) {}
 
   /**
@@ -31,7 +30,7 @@ export class UsersService {
       });
 
       if (existingUser) {
-        throw new ConflictException('Email already exists');
+        throw new ConflictException("Email already exists");
       }
 
       // Generate a unique user_id (like UID12345)
@@ -52,7 +51,7 @@ export class UsersService {
       if (error instanceof ConflictException) {
         throw error;
       }
-      throw new InternalServerErrorException('Error creating user');
+      throw new InternalServerErrorException("Error creating user");
     }
   }
 
@@ -67,13 +66,13 @@ export class UsersService {
    * Find users by role
    */
   async findByRole(role: string): Promise<User[]> {
-    // Import the Role enum at the top if not already imported
-    // import { Role } from './entities/user.entity';
-    if (!['admin', 'client', 'freelancer'].includes(role)) {
+    if (!["admin", "client", "freelancer"].includes(role)) {
       throw new BadRequestException(`Invalid role: ${role}`);
     }
     // Cast the string to the Role enum
-    const users = await this.usersRepository.find({ where: { role: role as any } });
+    const users = await this.usersRepository.find({
+      where: { role: role as any },
+    });
     if (!users.length) {
       throw new NotFoundException(`No users found with role: ${role}`);
     }
@@ -126,47 +125,54 @@ export class UsersService {
   }
 
   /**
-   * Set password reset token
+   * Set password reset OTP
    */
-  async setPasswordResetToken(email: string): Promise<{ token: string; user: User }> {
+  async setPasswordResetOtp(email: string, otp: string): Promise<void> {
     const user = await this.findByEmail(email);
 
-    // Generate a random token
-    const token = uuidv4();
+    // Hash the OTP
+    const hashedOtp = await bcrypt.hash(otp, 10);
 
-    // Set token and expiration (1 hour)
-    user.passwordResetToken = await bcrypt.hash(token, 10);
-    user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000);
+    // Set OTP and expiration (10 minutes)
+    user.resetOtp = hashedOtp;
+    user.resetOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     await this.usersRepository.save(user);
-
-    return { token, user };
   }
 
   /**
-   * Validate password reset token
+   * Validate password reset OTP
    */
-  async validatePasswordResetToken(
-    email: string,
-    token: string,
-  ): Promise<User> {
+  async validatePasswordResetOtp(email: string, otp: string): Promise<void> {
     const user = await this.findByEmail(email);
 
-    // Check if token exists and has not expired
+    // Check if OTP exists and has not expired
     if (
-      !user.passwordResetToken ||
-      user.passwordResetExpires < new Date()
+      !user.resetOtp ||
+      !user.resetOtpExpires ||
+      user.resetOtpExpires < new Date()
     ) {
-      throw new NotFoundException('Password reset token is invalid or has expired');
+      throw new BadRequestException("OTP is invalid or has expired");
     }
 
-    // Compare token with stored hash
-    const isValid = await bcrypt.compare(token, user.passwordResetToken);
+    // Compare OTP with stored hash
+    const isValid = await bcrypt.compare(otp, user.resetOtp);
     if (!isValid) {
-      throw new NotFoundException('Invalid password reset token');
+      throw new BadRequestException("Invalid OTP");
     }
+  }
 
-    return user;
+  /**
+   * Clear password reset OTP
+   */
+  async clearPasswordResetOtp(email: string): Promise<void> {
+    const user = await this.findByEmail(email);
+
+    // Clear OTP fields
+    user.resetOtp = "";
+    user.resetOtpExpires = null;
+
+    await this.usersRepository.save(user);
   }
 
   /**
@@ -177,10 +183,10 @@ export class UsersService {
 
     // Hash the new password
     user.password = await bcrypt.hash(password, 10);
-    
-    // Clear reset token fields
-    user.passwordResetToken = '';
-    user.passwordResetExpires = new Date(0);
+
+    // Clear OTP fields
+    user.resetOtp = "";
+    user.resetOtpExpires = null;
 
     return this.usersRepository.save(user);
   }
@@ -188,16 +194,19 @@ export class UsersService {
   /**
    * Update refresh token
    */
-  async setRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
+  async setRefreshToken(
+    userId: string,
+    refreshToken: string | null
+  ): Promise<void> {
     const user = await this.findById(userId);
-    
+
     if (refreshToken) {
       // Hash the refresh token before storing
       user.refreshToken = await bcrypt.hash(refreshToken, 10);
     } else {
-      user.refreshToken = '';
+      user.refreshToken = "";
     }
-    
+
     await this.usersRepository.save(user);
   }
 

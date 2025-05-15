@@ -26,20 +26,19 @@ let EmailService = class EmailService {
             },
         });
     }
-    async sendPasswordResetEmail(to, name, token) {
-        const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
-        const resetUrl = `${frontendUrl}/reset-password?email=${encodeURIComponent(to)}&token=${token}`;
+    async sendPasswordResetEmail(to, name, otp) {
         const mailOptions = {
             from: this.configService.get('EMAIL_FROM'),
             to,
-            subject: 'Password Reset Request',
+            subject: 'Password Reset OTP',
             html: `
         <h1>Reset Your Password</h1>
         <p>Hello ${name},</p>
-        <p>You requested to reset your password. Please click the link below to reset it:</p>
-        <p><a href="${resetUrl}" style="padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+        <p>You requested to reset your password. Use the following OTP to reset it:</p>
+        <p style="font-size: 24px; font-weight: bold; color: #4CAF50;">${otp}</p>
+        <p>Enter this OTP in the password reset form to proceed.</p>
         <p>If you didn't request this, please ignore this email and your password will remain unchanged.</p>
-        <p>This link will expire in 1 hour.</p>
+        <p>This OTP will expire in 10 minutes.</p>
         <p>Best regards,<br>The Freelance Platform Team</p>
       `,
         };
