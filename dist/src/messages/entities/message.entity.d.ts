@@ -6,5 +6,6 @@ export declare class Message {
     sender_id: string;
     recipient: User;
     recipient_id: string;
+    isRead: boolean;
     createdAt: Date;
 }

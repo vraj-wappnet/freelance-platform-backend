@@ -1,4 +1,4 @@
-import { Role } from '../../common/enums/roles.enum';
+import { Role } from "../../common/enums/roles.enum";
 export declare class UpdateUserDto {
     firstName?: string;
     lastName?: string;
@@ -9,4 +9,5 @@ export declare class UpdateUserDto {
     phone?: string;
     website?: string;
     profilePicture?: string;
+    photoUrl?: string;
 }

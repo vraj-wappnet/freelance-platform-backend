@@ -42,6 +42,10 @@ __decorate([
     __metadata("design:type", String)
 ], Message.prototype, "recipient_id", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Message.prototype, "isRead", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Message.prototype, "createdAt", void 0);

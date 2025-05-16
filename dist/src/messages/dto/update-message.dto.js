@@ -17,7 +17,16 @@ class UpdateMessageDto {
 exports.UpdateMessageDto = UpdateMessageDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'Message read status',
+        description: "Message content",
+        example: "Updated message content",
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateMessageDto.prototype, "content", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: "Message read status",
         example: true,
     }),
     (0, class_validator_1.IsOptional)(),

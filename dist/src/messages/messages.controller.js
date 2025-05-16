@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const messages_service_1 = require("./messages.service");
 const create_message_dto_1 = require("./dto/create-message.dto");
+const update_message_dto_1 = require("./dto/update-message.dto");
 let MessagesController = class MessagesController {
     constructor(messagesService) {
         this.messagesService = messagesService;
@@ -26,6 +27,12 @@ let MessagesController = class MessagesController {
     }
     getConversation(req, userId, recipientId) {
         return this.messagesService.findConversation(userId, recipientId);
+    }
+    update(req, id, updateMessageDto) {
+        return this.messagesService.update(id, updateMessageDto, req.user.id);
+    }
+    delete(req, id) {
+        return this.messagesService.remove(id, req.user.id);
     }
 };
 exports.MessagesController = MessagesController;
@@ -58,6 +65,35 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", void 0)
 ], MessagesController.prototype, "getConversation", null);
+__decorate([
+    (0, common_1.Patch)(":id"),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiOperation)({ summary: "Update an existing message" }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "The message has been successfully updated.",
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, update_message_dto_1.UpdateMessageDto]),
+    __metadata("design:returntype", void 0)
+], MessagesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiOperation)({ summary: "Delete an existing message" }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "The message has been successfully deleted.",
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], MessagesController.prototype, "delete", null);
 exports.MessagesController = MessagesController = __decorate([
     (0, swagger_1.ApiTags)("messages"),
     (0, common_1.Controller)("messages"),

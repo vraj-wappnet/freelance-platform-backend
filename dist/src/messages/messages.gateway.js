@@ -59,6 +59,39 @@ let MessagesGateway = class MessagesGateway {
             return { status: 'error', error: error.message };
         }
     }
+    async handleUpdateMessage(data, client) {
+        const { userId, messageId, updateMessageDto } = data;
+        try {
+            const message = await this.messagesService.update(messageId, updateMessageDto, userId);
+            const conversationRoom = [message.sender_id, message.recipient_id].sort().join('_');
+            this.logger.log(`Broadcasting updated message to room ${conversationRoom}: ${JSON.stringify(message)}`);
+            this.server.to(conversationRoom).emit('messageUpdated', message);
+            client.emit('updateMessageResponse', { status: 'success', message });
+            return { status: 'success', message };
+        }
+        catch (error) {
+            this.logger.error(`Error updating message: ${error.message}`);
+            client.emit('updateMessageResponse', { status: 'error', error: error.message });
+            return { status: 'error', error: error.message };
+        }
+    }
+    async handleDeleteMessage(data, client) {
+        const { userId, messageId } = data;
+        try {
+            const message = await this.messagesService.findOne(messageId);
+            await this.messagesService.remove(messageId, userId);
+            const conversationRoom = [message.sender_id, message.recipient_id].sort().join('_');
+            this.logger.log(`Broadcasting deleted message to room ${conversationRoom}: ${messageId}`);
+            this.server.to(conversationRoom).emit('messageDeleted', { messageId });
+            client.emit('deleteMessageResponse', { status: 'success', messageId });
+            return { status: 'success', messageId };
+        }
+        catch (error) {
+            this.logger.error(`Error deleting message: ${error.message}`);
+            client.emit('deleteMessageResponse', { status: 'error', error: error.message });
+            return { status: 'error', error: error.message };
+        }
+    }
 };
 exports.MessagesGateway = MessagesGateway;
 __decorate([
@@ -97,6 +130,22 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], MessagesGateway.prototype, "handleMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('updateMessage'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], MessagesGateway.prototype, "handleUpdateMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('deleteMessage'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], MessagesGateway.prototype, "handleDeleteMessage", null);
 exports.MessagesGateway = MessagesGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {

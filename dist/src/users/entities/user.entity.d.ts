@@ -1,8 +1,8 @@
-import { Role } from '../../common/enums/roles.enum';
-import { Project } from '../../projects/entities/project.entity';
-import { Bid } from '../../bids/entities/bid.entity';
-import { Contract } from '../../contracts/entities/contract.entity';
-import { Message } from '../../messages/entities/message.entity';
+import { Role } from "../../common/enums/roles.enum";
+import { Project } from "../../projects/entities/project.entity";
+import { Bid } from "../../bids/entities/bid.entity";
+import { Contract } from "../../contracts/entities/contract.entity";
+import { Message } from "../../messages/entities/message.entity";
 export declare class User {
     id: string;
     user_id: string;
@@ -29,4 +29,5 @@ export declare class User {
     receivedMessages: Message[];
     createdAt: Date;
     updatedAt: Date;
+    profilePhoto: string;
 }

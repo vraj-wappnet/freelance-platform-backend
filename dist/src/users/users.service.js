@@ -133,6 +133,17 @@ let UsersService = class UsersService {
         const user = await this.findById(id);
         await this.usersRepository.remove(user);
     }
+    async updateProfile(userId, updateData) {
+        await this.usersRepository.update(userId, {
+            firstName: updateData.firstName,
+            lastName: updateData.lastName,
+            location: updateData.location,
+            phone: updateData.phone,
+            bio: updateData.bio,
+            profilePhoto: updateData.profilePhoto,
+        });
+        return this.findById(userId);
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

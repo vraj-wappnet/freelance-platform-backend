@@ -16,24 +16,26 @@ const config_1 = require("@nestjs/config");
 const bcrypt = require("bcrypt");
 const users_service_1 = require("../users/users.service");
 const email_service_1 = require("./services/email.service");
+const cloudinary_service_1 = require("./services/cloudinary.service");
 let AuthService = class AuthService {
-    constructor(usersService, jwtService, configService, emailService) {
+    constructor(usersService, jwtService, configService, emailService, cloudinaryService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
         this.emailService = emailService;
+        this.cloudinaryService = cloudinaryService;
     }
     async validateUser(email, password) {
         try {
             const user = await this.usersService.findByEmail(email);
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
-                throw new common_1.UnauthorizedException('Invalid credentials');
+                throw new common_1.UnauthorizedException("Invalid credentials");
             }
             return user;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException('Invalid credentials');
+            throw new common_1.UnauthorizedException("Invalid credentials");
         }
     }
     async login(loginDto) {
@@ -48,6 +50,7 @@ let AuthService = class AuthService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+                profilePhoto: user.profilePhoto,
             },
             ...tokens,
         };
@@ -59,14 +62,14 @@ let AuthService = class AuthService {
                 email: user.email,
                 role: user.role,
             }, {
-                secret: this.configService.get('JWT_ACCESS_SECRET'),
-                expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION'),
+                secret: this.configService.get("JWT_ACCESS_SECRET"),
+                expiresIn: this.configService.get("JWT_ACCESS_EXPIRATION"),
             }),
             this.jwtService.signAsync({
                 sub: user.id,
             }, {
-                secret: this.configService.get('JWT_REFRESH_SECRET'),
-                expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION'),
+                secret: this.configService.get("JWT_REFRESH_SECRET"),
+                expiresIn: this.configService.get("JWT_REFRESH_EXPIRATION"),
             }),
         ]);
         return {
@@ -78,18 +81,18 @@ let AuthService = class AuthService {
         try {
             const user = await this.usersService.findById(userId);
             if (!user || !user.refreshToken) {
-                throw new common_1.UnauthorizedException('Invalid refresh token');
+                throw new common_1.UnauthorizedException("Invalid refresh token");
             }
             const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
             if (!refreshTokenMatches) {
-                throw new common_1.UnauthorizedException('Invalid refresh token');
+                throw new common_1.UnauthorizedException("Invalid refresh token");
             }
             const tokens = await this.generateTokens(user);
             await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
             return tokens;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException('Invalid refresh token');
+            throw new common_1.UnauthorizedException("Invalid refresh token");
         }
     }
     async logout(userId) {
@@ -122,7 +125,7 @@ let AuthService = class AuthService {
             return true;
         }
         catch (error) {
-            throw new common_1.BadRequestException('Invalid or expired OTP');
+            throw new common_1.BadRequestException("Invalid or expired OTP");
         }
     }
     async resetPassword(resetPasswordDto) {
@@ -134,8 +137,32 @@ let AuthService = class AuthService {
             return true;
         }
         catch (error) {
-            throw new common_1.BadRequestException('Invalid or expired OTP');
+            throw new common_1.BadRequestException("Invalid or expired OTP");
         }
+    }
+    async updateProfile(userId, updateProfileDto) {
+        const updatedUser = await this.usersService.updateProfile(userId, {
+            ...updateProfileDto,
+        });
+        return updatedUser;
+    }
+    async uploadProfilePhoto(userId, file) {
+        let profilePhotoUrl;
+        try {
+            const uploadResult = await this.cloudinaryService.uploadImage(file);
+            profilePhotoUrl = uploadResult;
+        }
+        catch (error) {
+            throw new common_1.BadRequestException("Failed to upload profile photo");
+        }
+        const updatedUser = await this.usersService.updateProfile(userId, {
+            profilePhoto: profilePhotoUrl,
+        });
+        return updatedUser;
+    }
+    async getProfile(userId) {
+        const user = await this.usersService.findById(userId);
+        return user;
     }
 };
 exports.AuthService = AuthService;
@@ -144,6 +171,7 @@ exports.AuthService = AuthService = __decorate([
     __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,
         config_1.ConfigService,
-        email_service_1.EmailService])
+        email_service_1.EmailService,
+        cloudinary_service_1.CloudinaryService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

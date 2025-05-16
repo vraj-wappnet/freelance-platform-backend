@@ -17,6 +17,7 @@ const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const jwt_refresh_strategy_1 = require("./strategies/jwt-refresh.strategy");
 const users_module_1 = require("../users/users.module");
 const email_service_1 = require("./services/email.service");
+const cloudinary_service_1 = require("./services/cloudinary.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -42,6 +43,7 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_strategy_1.JwtStrategy,
             jwt_refresh_strategy_1.JwtRefreshStrategy,
             email_service_1.EmailService,
+            cloudinary_service_1.CloudinaryService,
         ],
         exports: [auth_service_1.AuthService],
     })

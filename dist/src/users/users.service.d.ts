@@ -18,4 +18,12 @@ export declare class UsersService {
     resetPassword(email: string, password: string): Promise<User>;
     setRefreshToken(userId: string, refreshToken: string | null): Promise<void>;
     remove(id: string): Promise<void>;
+    updateProfile(userId: string, updateData: {
+        firstName?: string;
+        lastName?: string;
+        location?: string;
+        phone?: string;
+        bio?: string;
+        profilePhoto?: string;
+    }): Promise<User>;
 }

@@ -38,6 +38,16 @@ let MessagesService = class MessagesService {
         });
         return this.messagesRepository.save(message);
     }
+    async findOne(id) {
+        const message = await this.messagesRepository.findOne({
+            where: { id },
+            relations: ["sender", "recipient"],
+        });
+        if (!message) {
+            throw new common_1.NotFoundException("Message not found");
+        }
+        return message;
+    }
     async findConversation(userId, recipientId) {
         return this.messagesRepository
             .createQueryBuilder("message")
@@ -47,6 +57,21 @@ let MessagesService = class MessagesService {
             "(message.sender_id = :recipientId AND message.recipient_id = :userId))", { userId, recipientId })
             .orderBy("message.createdAt", "ASC")
             .getMany();
+    }
+    async update(id, updateMessageDto, userId) {
+        const message = await this.findOne(id);
+        if (message.sender_id !== userId) {
+            throw new common_1.ForbiddenException("You can only update your own messages");
+        }
+        Object.assign(message, updateMessageDto);
+        return this.messagesRepository.save(message);
+    }
+    async remove(id, userId) {
+        const message = await this.findOne(id);
+        if (message.sender_id !== userId) {
+            throw new common_1.ForbiddenException("You can only delete your own messages");
+        }
+        await this.messagesRepository.delete(id);
     }
 };
 exports.MessagesService = MessagesService;

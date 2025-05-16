@@ -5,17 +5,17 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
-import { Role } from '../../common/enums/roles.enum';
-import { Project } from '../../projects/entities/project.entity';
-import { Bid } from '../../bids/entities/bid.entity';
-import { Contract } from '../../contracts/entities/contract.entity';
-import { Message } from '../../messages/entities/message.entity';
+} from "typeorm";
+import { Exclude } from "class-transformer";
+import { Role } from "../../common/enums/roles.enum";
+import { Project } from "../../projects/entities/project.entity";
+import { Bid } from "../../bids/entities/bid.entity";
+import { Contract } from "../../contracts/entities/contract.entity";
+import { Message } from "../../messages/entities/message.entity";
 
-@Entity('users')
+@Entity("users")
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ unique: true })
@@ -35,7 +35,7 @@ export class User {
   password: string;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: Role,
     default: Role.FREELANCER,
   })
@@ -63,15 +63,15 @@ export class User {
   isVerified: boolean;
 
   @Exclude()
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: "varchar", nullable: true })
   resetOtp: string | null;
 
   @Exclude()
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   resetOtpExpires: Date | null;
 
   @Exclude()
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: "varchar", nullable: true })
   refreshToken: string | null;
 
   @OneToMany(() => Project, (project) => project.client)
@@ -97,4 +97,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  profilePhoto: string;
 }

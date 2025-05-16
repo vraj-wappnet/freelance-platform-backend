@@ -217,4 +217,45 @@ export class UsersService {
     const user = await this.findById(id);
     await this.usersRepository.remove(user);
   }
+
+  async updateProfile(
+    userId: string,
+    updateData: {
+      firstName?: string;
+      lastName?: string;
+      location?: string;
+      phone?: string;
+      bio?: string;
+      profilePhoto?: string;
+    }
+  ): Promise<User> {
+    await this.usersRepository.update(userId, {
+      firstName: updateData.firstName,
+      lastName: updateData.lastName,
+      location: updateData.location,
+      phone: updateData.phone,
+      bio: updateData.bio,
+      profilePhoto: updateData.profilePhoto,
+    });
+    return this.findById(userId);
+  }
 }
+
+
+
+
+
+
+
+
+  
+
+ 
+
+ 
+
+ 
+
+
+
+

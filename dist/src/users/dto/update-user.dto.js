@@ -18,8 +18,8 @@ class UpdateUserDto {
 exports.UpdateUserDto = UpdateUserDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User first name',
-        example: 'John',
+        description: "User first name",
+        example: "John",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -28,8 +28,8 @@ __decorate([
 ], UpdateUserDto.prototype, "firstName", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User last name',
-        example: 'Doe',
+        description: "User last name",
+        example: "Doe",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -38,8 +38,8 @@ __decorate([
 ], UpdateUserDto.prototype, "lastName", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User email address',
-        example: 'john.doe@example.com',
+        description: "User email address",
+        example: "john.doe@example.com",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -48,7 +48,7 @@ __decorate([
 ], UpdateUserDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User role',
+        description: "User role",
         enum: roles_enum_1.Role,
         required: false,
     }),
@@ -58,8 +58,8 @@ __decorate([
 ], UpdateUserDto.prototype, "role", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User bio',
-        example: 'Experienced web developer with 5 years of experience.',
+        description: "User bio",
+        example: "Experienced web developer with 5 years of experience.",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -68,8 +68,8 @@ __decorate([
 ], UpdateUserDto.prototype, "bio", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User location',
-        example: 'New York, USA',
+        description: "User location",
+        example: "New York, USA",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -78,8 +78,8 @@ __decorate([
 ], UpdateUserDto.prototype, "location", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User phone number',
-        example: '+1 123-456-7890',
+        description: "User phone number",
+        example: "+1 123-456-7890",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -88,8 +88,8 @@ __decorate([
 ], UpdateUserDto.prototype, "phone", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User website',
-        example: 'https://www.johndoe.com',
+        description: "User website",
+        example: "https://www.johndoe.com",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
@@ -98,12 +98,18 @@ __decorate([
 ], UpdateUserDto.prototype, "website", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'User profile picture URL',
-        example: 'https://example.com/profile.jpg',
+        description: "User profile picture URL",
+        example: "https://example.com/profile.jpg",
         required: false,
     }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "profilePicture", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false, description: "Profile photo URL" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "photoUrl", void 0);
 //# sourceMappingURL=update-user.dto.js.map

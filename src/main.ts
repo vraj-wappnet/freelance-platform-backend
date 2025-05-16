@@ -3,9 +3,11 @@ import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import * as cookieParser from "cookie-parser";
+import * as multer from 'multer';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(multer({ dest: './uploads' }).any());
 
   // Enable ValidationPipe globally
   app.useGlobalPipes(
